@@ -85,7 +85,7 @@ class KctpartsData():
 
             if data:
                 data = json.loads(data.text)
-                if(isinstance(data, dict))
+                if isinstance(data, dict):
                     for key,values in data.items():
                         lv_5 = values["text"]
                         path = os.path.join(self.folder_path, lv_1, lv_2, lv_3, lv_4, lv_5)
