@@ -30,7 +30,7 @@ class KctpartsData():
         self.folder_path = 'D:\Desktop\KctpartsData'  #设置存放的文件目录
         self.error_path = '' #错误文件
         self.q = Queue() #线程
-        self.THREADS_NUM = 10
+        self.THREADS_NUM = 20
     
     def working(self):
         while True:
@@ -106,7 +106,7 @@ class KctpartsData():
                                     "path":path
                                 })
                             else:
-                                self.save_log('文件已经存在：', path, file_name)
+                                print('文件已经存在：', path, file_name)
             else:
                 self.save_log('请求文件失败：', id)
         

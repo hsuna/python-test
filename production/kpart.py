@@ -102,6 +102,7 @@ class KPartData():
             r = self.request(url, data)
             if r:
                 content = r.text
+                self.mkdir(path)#创建文件夹
                 self.save_file(filepath, content)
             else:
                 self.error('请求文件失败：', json.dumps(data))
@@ -136,7 +137,6 @@ class KPartData():
             f.close()
 
     def save_file(self, filepath, content):
-        self.mkdir(path)#创建文件夹
         print('开始保存文件数据')
         f = open(filepath, 'a+')
         f.write(content)
