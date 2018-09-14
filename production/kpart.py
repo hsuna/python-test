@@ -30,7 +30,7 @@ class KPartData():
         self.page_url = 'http://www.k-part.com/komatsu/komatsu/page'  #要访问的网页地址
         self.img_url = 'http://free.komatsupartsbook.com/wm'
         self.folder_path = 'D:\Desktop\KPartData\json'  #设置存放的文件目录
-        self.img_path = 'D:\Desktop\KPartData\images'  #设置存放的图片目录
+        self.img_path = 'D:\Desktop\KPartData\img'  #设置存放的图片目录
         self.logs_path = 'D:\Desktop\KPartData\logs'  #设置存放的历史记录目录
         self.q = Queue() #线程
         self.THREADS_NUM = 10
@@ -116,7 +116,7 @@ class KPartData():
                     self.processing_data(item, data["depth"]+1)
             elif 'page' in url: #page
                 rdata = json.loads(content)
-                for img in rdata.image:
+                for img in rdata["image"]:
                     filepath = os.path.join(self.img_path, img.BookDir, img.PicName)
                     url = os.path.join(self.img_url, img.BookDir, img.PicName)
                     self.save_img(filepath, url)
@@ -212,3 +212,10 @@ class KPartData():
 
 kpart = KPartData()  #创建类的实例
 kpart.get_data()  #执行类中的方法
+
+""" r = kpart.request(kpart.page_url, {
+    'book': 6155,
+    'key': 5
+})
+rdata = json.loads(r.text)
+print(rdata["image"]) """
