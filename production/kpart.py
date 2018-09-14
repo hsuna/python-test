@@ -117,8 +117,10 @@ class KPartData():
             elif 'page' in url: #page
                 rdata = json.loads(content)
                 for img in rdata["image"]:
-                    filepath = os.path.join(self.img_path, img.BookDir, img.PicName)
-                    url = os.path.join(self.img_url, img.BookDir, img.PicName)
+                    url = self.img_url+'/'+img["BookDir"]+'/'+img["PicName"]
+                    path = os.path.join(self.img_path, img["BookDir"])
+                    filepath = os.path.join(path, img["PicName"])
+                    self.mkdir(path)#创建文件夹
                     self.save_img(filepath, url)
 
         else:
@@ -149,11 +151,10 @@ class KPartData():
         if not isExists:
             img = self.request_img(url)
             if img:
-                self.mkdir(path)#创建文件夹
                 print('开始保存图片数据')
                 f = open(filepath, 'ab')
                 f.write(img.content)
-                self.log('图片保存成功：', filename)
+                self.log('图片保存成功：', filepath)
                 f.close()
     
     def mkdir(self, path):  ##这个函数创建文件夹
@@ -218,4 +219,9 @@ kpart.get_data()  #执行类中的方法
     'key': 5
 })
 rdata = json.loads(r.text)
-print(rdata["image"]) """
+for img in rdata["image"]:
+    url = kpart.img_url+'/'+img["BookDir"]+'/'+img["PicName"]
+    path = os.path.join(kpart.img_path, img["BookDir"])
+    filepath = os.path.join(path, img["PicName"])
+    kpart.mkdir(path)#创建文件夹
+    kpart.save_img(filepath, url) """
