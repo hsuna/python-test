@@ -28,9 +28,10 @@ class KctpartsData():
         self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1'}  #给请求指定一个请求头来模拟chrome浏览器
         self.web_url = 'http://parts.kctparts.com/'  #要访问的网页地址
         self.folder_path = 'D:\Desktop\KctpartsData'  #设置存放的文件目录
-        self.error_path = '' #错误文件
+        self.access_path = '' #历史记录
+        self.error_path = '' #错误记录
         self.q = Queue() #线程
-        self.THREADS_NUM = 20
+        self.THREADS_NUM = 12
     
     def working(self):
         while True:
@@ -54,7 +55,9 @@ class KctpartsData():
         #创建主文件夹
         self.mkdir(self.folder_path)
         #添加历史记录路径
-        self.error_path = os.path.join(self.folder_path, 'error_'+time.strftime("%Y%m%d%H%M%S", time.localtime())+'.log')
+        time_str = time.strftime("%Y%m%d%H%M%S", time.localtime())
+        self.access_path = os.path.join(self.folder_path, 'access_'+time_str+'.log')
+        self.error_path = os.path.join(self.folder_path, 'error_'+time_str+'.log')
 
         all_a = BeautifulSoup(driver.page_source, 'lxml').select('a[href^="/#!hyundai-model"]')
 
@@ -97,33 +100,27 @@ class KctpartsData():
 
                             id = spanSoup.span["id"]
                             file_name = id+'.json'
-                            isExists = os.path.exists(file_name)
+                            file_path = os.path.join(path, file_name) 
+                            isExists = os.path.exists(file_path)
                             if not isExists:
                                 self.q.put({
                                     "id":id, 
                                     "title":title, 
                                     "file_name":file_name, 
-                                    "path":path
+                                    "file_path":file_path
                                 })
                             else:
-                                print('文件已经存在：', path, file_name)
+                                self.log('文件已经存在：', file_path)
             else:
-                self.save_log('请求文件失败：', id)
+                self.error('请求文件失败：', id)
         
         #等待进程结束
         self.q.join()
 
     def save_task(self, map):
-        path = map["path"]
-        os.chdir(path) #切换文件夹
-        result = self.save_file(map)
-        if not result:
-            self.save_log('请求文件失败：', path, map["id"])
-
-    def save_file(self, map):
         file = self.request(map["id"], 'catalog/getSpares')
+        file_path = map["file_path"]
         if file:
-            file_name = map["file_name"]
             print('开始解析文件')
             items = self.analy_file(file)
             content = json.dumps({
@@ -131,16 +128,21 @@ class KctpartsData():
                 'data': items
             })
             print('开始保存文件数据')
-            f = open(file_name, 'a+')
+            f = open(file_path, 'a+')
             f.write(content)
-            self.save_log('文件保存成功：', map["path"], file_name)
+            self.log('文件保存成功：', file_path)
             f.close()
-            return True
         else:
-            return False
+            self.error('请求文件失败：', file_path)
 
 
-    def save_log(self, *content):
+    def log(self, *content):
+        print(*content)
+        f = open(self.access_path, 'a+')
+        f.write("  ".join(content)+'\n')
+        f.close()
+
+    def error(self, *content):
         print(*content)
         f = open(self.error_path, 'a+')
         f.write("  ".join(content)+'\n')
