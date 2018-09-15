@@ -117,11 +117,12 @@ class KPartData():
             elif 'page' in url: #page
                 rdata = json.loads(content)
                 for img in rdata["image"]:
-                    url = self.img_url+'/'+img["BookDir"]+'/'+img["PicName"]
-                    path = os.path.join(self.img_path, img["BookDir"])
-                    filepath = os.path.join(path, img["PicName"])
-                    self.mkdir(path)#创建文件夹
-                    self.save_img(filepath, url)
+                    if "PicName" in img:
+                        url = self.img_url+'/'+img["BookDir"]+'/'+img["PicName"]
+                        path = os.path.join(self.img_path, img["BookDir"])
+                        filepath = os.path.join(path, img["PicName"])
+                        self.mkdir(path)#创建文件夹
+                        self.save_img(filepath, url)
 
         else:
             self.error('请求文件失败：', json.dumps(data))
