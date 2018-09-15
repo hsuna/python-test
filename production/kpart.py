@@ -92,7 +92,7 @@ class KPartData():
         self.q.put((url, data))
 
     def request_task(self, url, data):
-        path = os.path.join(self.folder_path, str(data["book"]))
+        path = os.path.join(self.folder_path, 'tree' if 'tree' in url else 'page', str(data["book"]))
         filename = str(data["key"])+'.json'
         filepath = os.path.join(path, filename)
         isExists = os.path.exists(filepath)

@@ -110,7 +110,7 @@ class KctpartsData():
                                     "file_path":file_path
                                 })
                             else:
-                                self.log('文件已经存在：', file_path)
+                                print('文件已经存在：', file_path)
             else:
                 self.error('请求文件失败：', id)
         
