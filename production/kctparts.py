@@ -27,7 +27,8 @@ class KctpartsData():
     def __init__(self):  #类的初始化操作
         self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1'}  #给请求指定一个请求头来模拟chrome浏览器
         self.web_url = 'http://parts.kctparts.com/'  #要访问的网页地址
-        self.folder_path = 'D:\Desktop\KctpartsData'  #设置存放的文件目录
+        self.folder_path = 'D:\Desktop\KctpartsData\data'  #设置存放的文件目录
+        self.log_path = 'D:\Desktop\KctpartsData\log'  #设置存放的文件目录
         self.access_path = '' #历史记录
         self.error_path = '' #错误记录
         self.q = Queue() #线程
@@ -54,12 +55,13 @@ class KctpartsData():
         
         #创建主文件夹
         self.mkdir(self.folder_path)
+        self.mkdir(self.log_path)
         #添加历史记录路径
         time_str = time.strftime("%Y%m%d%H%M%S", time.localtime())
-        self.access_path = os.path.join(self.folder_path, 'access_'+time_str+'.log')
-        self.error_path = os.path.join(self.folder_path, 'error_'+time_str+'.log')
+        self.access_path = os.path.join(self.log_path, 'access_'+time_str+'.log')
+        self.error_path = os.path.join(self.log_path, 'error_'+time_str+'.log')
 
-        all_a = BeautifulSoup(driver.page_source, 'lxml').select('a[href^="/#!hyundai-model"]')
+        all_a = BeautifulSoup(driver.page_source, 'lxml').select('a[href^="/#!hyundai-model"], a[href^="/#!doosan-model"], a[href^="/#!daemo-model"]')
 
         name_rule = re.compile(r'[\/\\*:?<>"|]*')
         
@@ -74,25 +76,22 @@ class KctpartsData():
             item.start()
         
         for a in all_a:
-            li_3 = a.find_parent('li').find_parent('li')
-            li_2 = li_3.find_parent('li')
-            li_1 = li_2.find_parent('li')
+            dirs = [a.get_text()]
+            li = a.find_parent('li').find_parent('li')
 
+            while hasattr(li, 'span'):
+                dirs.insert(0, li.span.get_text())
+                li = li.find_parent('li')
+                
             id = a['href'].replace("/#!", "")
-
-            lv_1 = li_1.span.get_text()
-            lv_2 = li_2.span.get_text()
-            lv_3 = li_3.span.get_text()
-            lv_4 = a.get_text()
             data = self.request(id, "catalog/getModel", "application/json, text/javascript, */*; q=0.01")
 
             if data:
                 data = json.loads(data.text)
                 if isinstance(data, dict):
                     for key,values in data.items():
-                        lv_5 = values["text"]
-                        path = os.path.join(self.folder_path, lv_1, lv_2, lv_3, lv_4, lv_5)
-                        self.mkdir(path)
+                        paths = dirs.copy()
+                        paths.append(values["text"])
 
                         for child in values["children"]:
                             spanSoup = BeautifulSoup(child["text"], 'lxml')
@@ -100,14 +99,15 @@ class KctpartsData():
 
                             id = spanSoup.span["id"]
                             file_name = id+'.json'
-                            file_path = os.path.join(path, file_name) 
+                            file_path = os.path.join(self.folder_path, file_name) 
                             isExists = os.path.exists(file_path)
                             if not isExists:
                                 self.q.put({
                                     "id":id, 
-                                    "title":title, 
+                                    "title":title,
                                     "file_name":file_name, 
-                                    "file_path":file_path
+                                    "file_path":file_path,
+                                    "paths": paths
                                 })
                             else:
                                 print('文件已经存在：', file_path)
@@ -117,16 +117,12 @@ class KctpartsData():
         #等待进程结束
         self.q.join()
 
-    def save_task(self, map):
-        file = self.request(map["id"], 'catalog/getSpares')
-        file_path = map["file_path"]
+    def save_task(self, data):
+        file = self.request(data["id"], 'catalog/getSpares')
+        file_path = data["file_path"]
         if file:
             print('开始解析文件')
-            items = self.analy_file(file)
-            content = json.dumps({
-                'title': map["title"],
-                'data': items
-            })
+            content = self.analy_file(data, file)
             print('开始保存文件数据')
             f = open(file_path, 'a+')
             f.write(content)
@@ -148,7 +144,7 @@ class KctpartsData():
         f.write("  ".join(content)+'\n')
         f.close()
 
-    def analy_file(self, file):
+    def analy_file(self, data, file):
         items = []
         table = BeautifulSoup(file.text, 'lxml').find(id='items_list').find('table')
         ths = table.select('thead th')
@@ -163,8 +159,12 @@ class KctpartsData():
                     tmp[th.get_text()] = tds[i].get_text()
 
             items.append(tmp)
-
-        return items
+            
+        return json.dumps({
+            'title': data["title"],
+            'dirs': data["paths"],
+            'data': items
+        })
 
     @retry(times=3)
     def request(self, node_id, r, accept="*/*"):
