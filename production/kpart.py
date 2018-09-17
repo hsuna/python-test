@@ -72,6 +72,7 @@ class KPartData():
 
         #等待进程结束
         self.q.join()
+        self.log('数据获取执行完成！！！')
 
     def processing_data(self, data, depth):
         book = data["book"] if "book" in data else ''

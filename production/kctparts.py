@@ -27,8 +27,8 @@ class KctpartsData():
     def __init__(self):  #类的初始化操作
         self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1'}  #给请求指定一个请求头来模拟chrome浏览器
         self.web_url = 'http://parts.kctparts.com/'  #要访问的网页地址
-        self.folder_path = 'D:\Desktop\KctpartsData\data'  #设置存放的文件目录
-        self.cache_path = 'D:\Desktop\KctpartsData\cache'  #设置缓存的文件目录
+        self.subas_path = 'D:\Desktop\KctpartsData\subas'  #设置存放的文件目录
+        self.model_path = 'D:\Desktop\KctpartsData\model'  #设置缓存的文件目录
         self.log_path = 'D:\Desktop\KctpartsData\log'  #设置存放的文件目录
         self.access_path = '' #历史记录
         self.error_path = '' #错误记录
@@ -55,8 +55,8 @@ class KctpartsData():
         print('访问成功')
         
         #创建主文件夹
-        self.mkdir(self.folder_path)
-        self.mkdir(self.cache_path)        
+        self.mkdir(self.subas_path)
+        self.mkdir(self.model_path)        
         self.mkdir(self.log_path)
         #添加历史记录路径
         time_str = time.strftime("%Y%m%d%H%M%S", time.localtime())
@@ -93,12 +93,14 @@ class KctpartsData():
         
         #等待进程结束
         self.q.join()
+        self.log('数据获取执行完成！！！')
 
     def get_model_list(self, href, dirs):
         id = re.match(r'/#!(.*/)?([^/]*)', href).group(2)
         file_name = id.replace(":", "_")+'.json'
-        file_path = os.path.join(self.cache_path, file_name)
+        file_path = os.path.join(self.model_path, file_name)
         isExists = os.path.exists(file_path)
+        content = False
         if not isExists:
             data = self.request(id, "catalog/getModel", "application/json, text/javascript, */*; q=0.01")
             if data:
@@ -137,7 +139,7 @@ class KctpartsData():
 
                 id = spanSoup.span["id"]
                 file_name = id.replace(":", "_")+'.json'
-                file_path = os.path.join(self.folder_path, file_name) 
+                file_path = os.path.join(self.subas_path, file_name) 
                 isExists = os.path.exists(file_path)
                 if not isExists:
                     self.q.put({
