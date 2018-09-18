@@ -97,6 +97,7 @@ class KPartData():
         filename = str(data["key"])+'.json'
         filepath = os.path.join(path, filename)
         isExists = os.path.exists(filepath)
+        content = False
         if isExists:
             content = self.get_file(filepath)
         else:
