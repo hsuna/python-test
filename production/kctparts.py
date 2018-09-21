@@ -64,8 +64,6 @@ class KctpartsData():
         self.error_path = os.path.join(self.log_path, 'error_'+time_str+'.log')
 
         all_a = BeautifulSoup(driver.page_source, 'lxml').select('.folder > a[href^="/#!"]')
-
-        name_rule = re.compile(r'[\/\\*:?<>"|]*')
         
         #开启线程
         threads = []        

@@ -33,7 +33,7 @@ class KPartData():
         self.img_path = 'D:\Desktop\KPartData\img'  #设置存放的图片目录
         self.logs_path = 'D:\Desktop\KPartData\logs'  #设置存放的历史记录目录
         self.q = Queue() #线程
-        self.THREADS_NUM = 10
+        self.THREADS_NUM = 24
     
     def working(self):
         while True:
@@ -117,14 +117,17 @@ class KPartData():
                 for item in items:
                     self.processing_data(item, data["depth"]+1)
             elif 'page' in url: #page
-                rdata = json.loads(content)
-                for img in rdata["image"]:
-                    if "PicName" in img:
-                        url = self.img_url+'/'+img["BookDir"]+'/'+img["PicName"]
-                        path = os.path.join(self.img_path, img["BookDir"])
-                        filepath = os.path.join(path, img["PicName"])
-                        self.mkdir(path)#创建文件夹
-                        self.save_img(filepath, url)
+                try:
+                    rdata = json.loads(content)
+                    for img in rdata["image"]:
+                        if "PicName" in img:
+                            url = self.img_url+'/'+img["BookDir"]+'/'+img["PicName"]
+                            path = os.path.join(self.img_path, img["BookDir"])
+                            filepath = os.path.join(path, img["PicName"])
+                            self.mkdir(path)#创建文件夹
+                            self.save_img(filepath, url)
+                except Exception as e:
+                    self.error('json解析失败：', url)
 
         else:
             self.error('请求文件失败：', json.dumps(data))
