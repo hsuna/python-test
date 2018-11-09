@@ -49,7 +49,8 @@ class DoubanSpider(scrapy.Spider):
 
             yield item
 
-        next_page = selector.xpath('//span[@class="next"]/a/@href').extract()[0]
-        url = 'https://movie.douban.com/top250' + next_page
+        next_page = selector.xpath('//span[@class="next"]/a/@href').extract()
         if next_page:
+            next_page = next_page[0]
+            url = 'https://movie.douban.com/top250' + next_page
             yield scrapy.Request(url, callback=self.parse)

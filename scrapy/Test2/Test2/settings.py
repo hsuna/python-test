@@ -65,8 +65,12 @@ SPIDER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'Test2.pipelines.DoubanPipeline': 1,
+#    'Test2.pipelines.DoubanPipeline': 1,
+#    'Test2.pipelines.ImagePipeline': 100,
+    'Test2.pipelines.MySqlPipeline': 200,
 }
+
+IMAGES_STORE = 'E:\\img\\'
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
