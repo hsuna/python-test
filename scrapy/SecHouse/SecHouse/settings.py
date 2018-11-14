@@ -19,7 +19,7 @@ NEWSPIDER_MODULE = 'SecHouse.spiders'
 #USER_AGENT = 'SecHouse (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
@@ -52,9 +52,10 @@ ROBOTSTXT_OBEY = True
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
+DOWNLOADER_MIDDLEWARES = {
+    'SecHouse.middlewares.ProxyMiddleware': 543,
 #    'SecHouse.middlewares.SechouseDownloaderMiddleware': 543,
-#}
+}
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
@@ -88,3 +89,16 @@ ROBOTSTXT_OBEY = True
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# Proxys settings
+PROXIES = [
+    "http://47.106.96.233:80",
+    "http://117.191.11.72:80",
+    "http://39.105.95.204:80",
+    "http://61.176.223.7:58822",
+    "http://183.166.129.53:8080",
+    "http://61.183.176.122:57210",
+    "http://218.204.129.195:43809",
+
+    
+]

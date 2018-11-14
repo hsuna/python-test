@@ -9,16 +9,39 @@ import scrapy
 
 
 class HouseItem(scrapy.Item):
+    # 所属小区
+    district = scrapy.Field()
     # 房屋户型
     mode = scrapy.Field()
     # 房屋单价
     price = scrapy.Field()
-    # 房屋位置
+    # 所在位置
     location = scrapy.Field()
+    # 建筑面积
     area = scrapy.Field()
-    # 房屋面积
+    # 参考首付
+    downpayment = scrapy.Field()
+    # 建造年代
+    built = scrapy.Field()
+    # 房屋朝向
+    orientation = scrapy.Field()
+    # 参考月供
+    payment = scrapy.Field()
+    # 房屋类型
+    house_type = scrapy.Field()
+    # 所在楼层
     floor = scrapy.Field()
-    # 楼龄
+    # 装修程度
+    decorate = scrapy.Field()
+    # 产权年限
     age = scrapy.Field()
+    # 配套电梯
+    elevator = scrapy.Field()
+    # 房本年限
+    agelimit = scrapy.Field()
+    # 产权性质
+    property_right = scrapy.Field()
+    # 唯一住房
+    only = scrapy.Field()
+
     
-    district = scrapy.Field()
