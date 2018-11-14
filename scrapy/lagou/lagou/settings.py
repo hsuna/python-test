@@ -51,7 +51,7 @@ ROBOTSTXT_OBEY = False
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    'lagou.middlewares.ProxyMiddleware': 543,
+#    'lagou.middlewares.ProxyMiddleware': 543,
 #    'lagou.middlewares.LagouDownloaderMiddleware': 543,
 }
 
@@ -103,10 +103,8 @@ PROXIES = [
     "http://183.166.129.53:8080",
     "http://61.183.176.122:57210",
     "http://218.204.129.195:43809",
-]
 
-PROXIES_BAK = [
-
+    
     "http://59.62.52.214:9000","http://60.191.201.38:45461",
     "http://58.87.73.43:8118","http://27.203.164.113:8060","http://112.230.247.164:8060",
     "http://111.8.150.102:44680","http://136.228.128.6:37064",
@@ -114,4 +112,7 @@ PROXIES_BAK = [
     "http://163.125.112.31:8118","http://39.137.69.9:80","http://117.87.177.247:9000","http://58.87.73.43:8118","http://47.98.198.125:8118",
     "http://117.28.97.121:808","http://60.6.241.72:808","http://117.114.149.10:45801",
     "http://222.180.162.245:9999","http://163.125.112.83:8118","http://112.16.169.194:32576",
+]
+
+PROXIES_BAK = [
 ]
