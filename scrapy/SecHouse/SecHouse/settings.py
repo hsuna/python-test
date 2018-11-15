@@ -53,7 +53,7 @@ ROBOTSTXT_OBEY = False
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    'SecHouse.middlewares.ProxyMiddleware': 543,
+#    'SecHouse.middlewares.ProxyMiddleware': 543,
 #    'SecHouse.middlewares.SechouseDownloaderMiddleware': 543,
 }
 
@@ -65,9 +65,10 @@ DOWNLOADER_MIDDLEWARES = {
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
+ITEM_PIPELINES = {
+    'SecHouse.pipelines.MongoPipeline': 1,
 #    'SecHouse.pipelines.SechousePipeline': 300,
-#}
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -90,6 +91,12 @@ DOWNLOADER_MIDDLEWARES = {
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
+# MongoDB settings
+MONGODB_SERVER = 'localhost'
+MONGODB_PORT = 27017
+MONGODB_DB = 'python'
+MONGODB_COLLECTION = 'sechouse'
+
 # Proxys settings
 PROXIES = [
     "http://47.106.96.233:80",
@@ -99,6 +106,4 @@ PROXIES = [
     "http://183.166.129.53:8080",
     "http://61.183.176.122:57210",
     "http://218.204.129.195:43809",
-
-    
 ]
