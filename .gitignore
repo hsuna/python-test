@@ -3,3 +3,11 @@
 .vscode
 
 __pycache__
+
+*.db
+*.log
+
+# egg
+*.egg
+**/egg
+**/project.egg-info
