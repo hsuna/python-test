@@ -50,7 +50,7 @@ class MobileHouseSpider(CrawlSpider):
     name = 'mhouse'
     start_urls = ['https://m.anjuke.com/gz/sale/']
     custom_settings = {
-        "DOWNLOAD_DELAY": 5,
+        "DOWNLOAD_DELAY": 3,
         "DEFAULT_REQUEST_HEADERS": {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
             'Accept-Encoding': 'gzip, deflate, br',

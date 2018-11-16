@@ -50,7 +50,7 @@ class MobileHouseSpider(CrawlSpider):
     name = 'mhouse'
     start_urls = ['https://m.anjuke.com/gz/sale/']
     custom_settings = {
-        "DOWNLOAD_DELAY": 5,
+        "DOWNLOAD_DELAY": 3,
         "DEFAULT_REQUEST_HEADERS": {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
             'Accept-Encoding': 'gzip, deflate, br',
@@ -61,7 +61,7 @@ class MobileHouseSpider(CrawlSpider):
     #start_urls = ['http://192.168.16.84:5500/test/house/3.html']
    
     def start_requests(self):
-        for i in range(1, 2):
+        for i in range(11, 20):
             url = 'https://m.anjuke.com/gz/sale/?from=anjuke_home&page='+str(i)
             yield scrapy.Request(url, callback=self.parse_page, meta={
                 'dont_redirect': True,
