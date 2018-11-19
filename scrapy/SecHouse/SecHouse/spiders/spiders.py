@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 
+import re
+
+from pymongo import MongoClient
+
 import scrapy
+from scrapy.conf import settings
 from scrapy.selector import Selector
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-from SecHouse.items import HouseItem,MHouseItem
+from SecHouse.items import HouseItem,HouseItem2,HouseItem3
 
 class HouseSpider(CrawlSpider):
     name = 'house'
@@ -46,8 +51,8 @@ class HouseSpider(CrawlSpider):
         return item
 
 
-class MobileHouseSpider(CrawlSpider):
-    name = 'mhouse'
+class HouseSpider2(CrawlSpider):
+    name = 'house2'
     start_urls = ['https://m.anjuke.com/gz/sale/']
     custom_settings = {
         "DOWNLOAD_DELAY": 3,
@@ -83,7 +88,7 @@ class MobileHouseSpider(CrawlSpider):
         selector = Selector(response)
 
         # 存放房子信息
-        item = MHouseItem()
+        item = HouseItem2()
         
         housebasic = selector.xpath('//div[@class="house-info-content"]')
         if housebasic.extract()[0]:
@@ -108,5 +113,76 @@ class MobileHouseSpider(CrawlSpider):
                 item['traffic'        ] = houseinfo[11].xpath('normalize-space(./text())').extract()[0]
             except Exception as e:
                 item['traffic'        ] = ''
+            #print(item)
+            return item
+
+
+
+class HouseSpider3(CrawlSpider):
+    name = 'house3'
+    start_urls = ['https://m.anjuke.com/gz/sale/']
+    custom_settings = {
+        "DOWNLOAD_DELAY": 3,
+        "DEFAULT_REQUEST_HEADERS": {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Eanguage': 'zh-CN,zh;q=0.9,en;q=0.8',
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+        }
+    }
+    dont_redirect = True
+    handle_httpstatus_list = [302]
+
+    def start_requests(self):
+        client = MongoClient(settings['MONGODB_SERVER'], settings['MONGODB_PORT'])
+        db = client[settings['MONGODB_DB']]
+        self.collection = db[settings['MONGODB_COLLECTION']]
+
+        for i in range(1, 200):
+            url = 'https://m.anjuke.com/gz/sale/?from=anjuke_home&page='+str(i)
+            yield scrapy.Request(url, callback=self.parse_page)
+
+    def parse_page(self, response):
+        selector = Selector(response)
+        urls = selector.xpath('//a[contains(@class, "house-item")]/@href').extract()
+        
+        for url in urls:
+            house_id = re.match(r'.*/gz/sale/(\w*).*', url, re.M|re.I)
+            if str(house_id) == 'None':
+                pass
+            else:
+                result = self.collection.find_one({'house_id': house_id.group(1)})
+                if result:
+                    pass
+                else:
+                    yield scrapy.Request(url, callback=self.parse_item)
+    
+
+    def parse_item(self, response):
+        selector = Selector(response)
+        housebasic = selector.xpath('//div[@class="house-info-content"]')
+        if len(housebasic.extract()) > 0:
+            # 存放房子信息
+            item = HouseItem3()
+            item['house_id'       ] = re.match(r'.*/gz/sale/(\w*).*', response.url, re.M|re.I).group(1)
+            item['title'          ] = housebasic.xpath('normalize-space(./div[@class="house-address"]/text())').extract()[0]
+            item['tolprice'       ] = housebasic.xpath('normalize-space(./div[@class="house-data"]/span[1]/text())').extract()[0]
+            item['mode'           ] = housebasic.xpath('normalize-space(./div[@class="house-data"]/span[2]/text())').extract()[0]
+            item['area'           ] = housebasic.xpath('normalize-space(./div[@class="house-data"]/span[3]/text())').extract()[0]
+
+            houseinfo = selector.xpath('//ul[@class="info-list"]/li')
+            for i, info in enumerate(houseinfo):
+                item['price'          ] = info.xpath('normalize-space(./text())').extract()[0] if i==0 else ''
+                item['orientation'    ] = info.xpath('normalize-space(./text())').extract()[0] if i==1 else ''
+                item['floor'          ] = info.xpath('normalize-space(./text())').extract()[0] if i==2 else ''
+                item['decorate'       ] = info.xpath('normalize-space(./text())').extract()[0] if i==3 else ''
+                item['built'          ] = info.xpath('normalize-space(./text())').extract()[0] if i==4 else ''
+                item['house_type'     ] = info.xpath('normalize-space(./text())').extract()[0] if i==5 else ''
+                item['agelimit'       ] = info.xpath('normalize-space(./text())').extract()[0] if i==6 else ''
+                item['elevator'       ] = info.xpath('normalize-space(./text())').extract()[0] if i==7 else ''
+                item['only'           ] = info.xpath('normalize-space(./text())').extract()[0] if i==8 else ''
+                item['budget'         ] = info.xpath('normalize-space(./a/text())').extract()[0] if i==9 else ''
+                item['district'       ] = info.xpath('normalize-space(./a/text())').extract()[0] if i==10 else ''
+                item['traffic'       ] = info.xpath('normalize-space(./text())').extract()[0] if i==11 else ''
             #print(item)
             return item

@@ -36,8 +36,9 @@ class MongoPipeline(object):
         return True
 
 class MongoPipeline2(MongoPipeline):
+
     def valid_item(self, item):
-        results = self.collection.find_one({'house_id': item['house_id']})
+        result = self.collection.find_one({'house_id': item['house_id']})
         if result:
             return False
         else:
