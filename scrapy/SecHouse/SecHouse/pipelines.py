@@ -20,47 +20,25 @@ class MongoPipeline(object):
         client = MongoClient(settings['MONGODB_SERVER'], settings['MONGODB_PORT'])
         db = client[settings['MONGODB_DB']]
         self.collection = db[settings['MONGODB_COLLECTION']]
-
+    
     def process_item(self, item, spider):
-        #house_item = [{
-        #    'district'      : item['district'      ],
-        #    'mode'          : item['mode'          ],
-        #    'price'         : item['price'         ],
-        #    'location'      : item['location'      ],
-        #    'area'          : item['area'          ],
-        #    'downpayment'   : item['downpayment'   ],
-        #    'built'         : item['built'         ],
-        #    'orientation'   : item['orientation'   ],
-        #    'payment'       : item['payment'       ],
-        #    'house_type'    : item['house_type'    ],
-        #    'floor'         : item['floor'         ],
-        #    'decorate'      : item['decorate'      ],
-        #    'age'           : item['age'           ],
-        #    'elevator'      : item['elevator'      ],
-        #    'agelimit'      : item['agelimit'      ],
-        #    'property_right': item['property_right'],
-        #    'only'          : item['only'          ],
-        #}]
-
-        mhouse_item = [{
-            'title'   :item['title'   ],
-            'tolprice':item['tolprice'],
-            'mode'    :item['mode'    ],
-            'area'    :item['area'    ],
-            'price'        :item['price'        ],
-            'orientation'  :item['orientation'  ],
-            'floor'        :item['floor'        ],
-            'decorate'     :item['decorate'     ],
-            'built'        :item['built'        ],
-            'house_type'   :item['house_type'   ],
-            'agelimit'     :item['agelimit'     ],
-            'elevator'     :item['elevator'     ],
-            'only'         :item['only'         ],
-            'budget'       :item['budget'       ],
-            'district'     :item['district'     ],
-            'traffic'      :item['traffic'      ],
-        }]
-
-        self.collection.insert(mhouse_item)
-        logging.debug("Item wrote to MongoDB database %s/%s"%(settings['MONGODB_DB'],settings['MONGODB_COLLECTION']))
+        valid=True
+        for data in item:
+            if not data:
+                valid=False
+                raise DropItem('Missing{0}!'.format(data))
+        if valid and self.valid_item(item):
+            self.collection.insert(dict(item))
+            logging.debug("Item wrote to MongoDB database %s/%s"%(settings['MONGODB_DB'],settings['MONGODB_COLLECTION']))
         return item
+    
+    def valid_item(self, item):
+        return True
+
+class MongoPipeline2(MongoPipeline):
+    def valid_item(self, item):
+        results = self.collection.find_one({'house_id': item['house_id']})
+        if result:
+            return False
+        else:
+            return True

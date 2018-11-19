@@ -66,7 +66,7 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'SecHouse.pipelines.MongoPipeline': 1,
+    'SecHouse.pipelines.MongoPipeline2': 1,
 #    'SecHouse.pipelines.SechousePipeline': 300,
 }
 
