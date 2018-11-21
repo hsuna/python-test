@@ -98,7 +98,8 @@ REDIRECT_ENABLED = False
 MONGODB_SERVER = 'localhost'
 MONGODB_PORT = 27017
 MONGODB_DB = 'python'
-MONGODB_COLLECTION = 'sechouse'
+MONGODB_COLLECTION_PAGE = 'secpage'
+MONGODB_COLLECTION_HOUSE = 'sechouse'
 
 # Proxys settings
 PROXIES = [

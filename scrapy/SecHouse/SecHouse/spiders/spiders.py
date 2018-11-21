@@ -122,7 +122,7 @@ class HouseSpider3(CrawlSpider):
     name = 'house3'
     start_urls = ['https://m.anjuke.com/gz/sale/']
     custom_settings = {
-        "DOWNLOAD_DELAY": 3,
+        "DOWNLOAD_DELAY": 5,
         "DEFAULT_REQUEST_HEADERS": {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
             'Accept-Encoding': 'gzip, deflate, br',
@@ -138,11 +138,14 @@ class HouseSpider3(CrawlSpider):
         db = client[settings['MONGODB_DB']]
         self.collection = db[settings['MONGODB_COLLECTION']]
 
-        for i in range(1, 200):
+        for i in range(1, 500):
             url = 'https://m.anjuke.com/gz/sale/?from=anjuke_home&page='+str(i)
             yield scrapy.Request(url, callback=self.parse_page)
 
     def parse_page(self, response):
+        if response.status == 302:
+            return
+        
         selector = Selector(response)
         urls = selector.xpath('//a[contains(@class, "house-item")]/@href').extract()
         
@@ -170,19 +173,30 @@ class HouseSpider3(CrawlSpider):
             item['mode'           ] = housebasic.xpath('normalize-space(./div[@class="house-data"]/span[2]/text())').extract()[0]
             item['area'           ] = housebasic.xpath('normalize-space(./div[@class="house-data"]/span[3]/text())').extract()[0]
 
+            names = [
+                'price'      ,
+                'orientation',
+                'floor'      ,
+                'decorate'   ,
+                'built'      ,
+                'house_type' ,
+                'agelimit'   ,
+                'elevator'   ,
+                'only'       ,
+                'budget'     ,
+                'district'   ,
+                'traffic'    ,
+            ]
             houseinfo = selector.xpath('//ul[@class="info-list"]/li')
             for i, info in enumerate(houseinfo):
-                item['price'          ] = info.xpath('normalize-space(./text())').extract()[0] if i==0 else ''
-                item['orientation'    ] = info.xpath('normalize-space(./text())').extract()[0] if i==1 else ''
-                item['floor'          ] = info.xpath('normalize-space(./text())').extract()[0] if i==2 else ''
-                item['decorate'       ] = info.xpath('normalize-space(./text())').extract()[0] if i==3 else ''
-                item['built'          ] = info.xpath('normalize-space(./text())').extract()[0] if i==4 else ''
-                item['house_type'     ] = info.xpath('normalize-space(./text())').extract()[0] if i==5 else ''
-                item['agelimit'       ] = info.xpath('normalize-space(./text())').extract()[0] if i==6 else ''
-                item['elevator'       ] = info.xpath('normalize-space(./text())').extract()[0] if i==7 else ''
-                item['only'           ] = info.xpath('normalize-space(./text())').extract()[0] if i==8 else ''
-                item['budget'         ] = info.xpath('normalize-space(./a/text())').extract()[0] if i==9 else ''
-                item['district'       ] = info.xpath('normalize-space(./a/text())').extract()[0] if i==10 else ''
-                item['traffic'       ] = info.xpath('normalize-space(./text())').extract()[0] if i==11 else ''
+                name = names[i]
+                text = info.xpath('normalize-space(./text())').extract()
+                a_text = info.xpath('normalize-space(./a[1]/text())').extract()
+                if name == 'budget':
+                    item[name] = a_text[0]
+                elif name == 'district':
+                    item[name] = a_text[0] + text[0]
+                else:
+                    item[name] = text[0]
             #print(item)
             return item
