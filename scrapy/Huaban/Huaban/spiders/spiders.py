@@ -12,9 +12,6 @@ from scrapy.spiders import CrawlSpider
 from scrapy.http import Request, FormRequest
 from Huaban.items import HuabanItem
 
-INPUT_EMAIL='xxxxxxx'
-INPUT_PASSWORD='xxxxxxxx'
-
 class HuabanSpider(CrawlSpider):
     name='huaban'
     limit=100
@@ -36,6 +33,11 @@ class HuabanSpider(CrawlSpider):
         "X-Requested-With": "XMLHttpRequest",
     }
 
+    def __init__(self, email='', password='', *args, **kwargs):
+        super(HuabanSpider, self).__init__(*args, **kwargs)
+        self.email = email
+        self.password = password
+
     def start_requests(self):
         return [Request(
             url="http://login.meiwu.co/login",
@@ -47,8 +49,8 @@ class HuabanSpider(CrawlSpider):
     def post_login(self, response):
         data={
             '_ref': 'loginPage',
-            'email': INPUT_EMAIL,
-            'password': INPUT_PASSWORD
+            'email': self.email,
+            'password': self.password
         } #构造表单数据
         yield FormRequest(
             url='http://login.meiwu.co/auth/',
@@ -70,8 +72,6 @@ class HuabanSpider(CrawlSpider):
         data = json.loads(response.body)
         boards = data["user"]["boards"]
         max = 0
-
-        print(response.url)
 
         for board in boards:
             board_id = board["board_id"]
@@ -119,7 +119,7 @@ class HuabanSpider(CrawlSpider):
 
 
 
-class HuabanSpider2(CrawlSpider):
+class Huaban2Spider(CrawlSpider):
     name='huaban2'
     limit=100
     custom_settings={
@@ -140,6 +140,11 @@ class HuabanSpider2(CrawlSpider):
         "X-Requested-With": "XMLHttpRequest",
     }
 
+    def __init__(self, email='', password='', *args, **kwargs):
+        super(Huaban2Spider, self).__init__(*args, **kwargs)
+        self.email = email
+        self.password = password
+
     def start_requests(self):
         return [Request(
             url="http://login.meiwu.co/login",
@@ -151,8 +156,8 @@ class HuabanSpider2(CrawlSpider):
     def post_login(self, response):
         data={
             '_ref': 'loginPage',
-            'email': INPUT_EMAIL,
-            'password': INPUT_PASSWORD
+            'email': self.email,
+            'password': self.password
         } #构造表单数据
         yield FormRequest(
             url='http://login.meiwu.co/auth/',

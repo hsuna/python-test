@@ -4,6 +4,9 @@
 
 __pycache__
 
+build
+dist
+
 *.db
 *.log
 

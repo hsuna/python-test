@@ -11,8 +11,6 @@
 
 BOT_NAME = 'Huaban'
 
-IMAGES_STORE = 'D:\Desktop\Huaban'  #设置图片要存放的文件目录
-
 SPIDER_MODULES = ['Huaban.spiders']
 NEWSPIDER_MODULE = 'Huaban.spiders'
 
@@ -90,3 +88,8 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+
+# log
+LOG_LEVEL = 'INFO'
+LOG_FILE = './info.log'
