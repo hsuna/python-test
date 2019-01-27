@@ -7,7 +7,6 @@
 
 import scrapy
 
-
 class HuabanItem(scrapy.Item):
     # define the fields for your item here like:
     # 目录名

@@ -6,8 +6,6 @@ import json
 from urllib.parse import urlparse, urlunparse
 
 import scrapy
-from scrapy.conf import settings
-from scrapy.selector import Selector
 from scrapy.spiders import CrawlSpider
 from scrapy.http import Request, FormRequest
 from Huaban.items import HuabanItem

@@ -31,7 +31,6 @@ import scrapy.downloadermiddlewares.cookies
 import scrapy.downloadermiddlewares.useragent
 import scrapy.downloadermiddlewares.httpproxy
 import scrapy.downloadermiddlewares.ajaxcrawl
-import scrapy.downloadermiddlewares.chunked
 import scrapy.downloadermiddlewares.decompression
 import scrapy.downloadermiddlewares.defaultheaders
 import scrapy.downloadermiddlewares.downloadtimeout
@@ -56,6 +55,11 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
 #导入模块
+import Huaban.middlewares
+import Huaban.pipelines
+import Huaban.settings
+import Huaban.items
+
 from Huaban.spiders.spiders import Huaban2Spider
 
 email = input("请输入账号邮箱：")
