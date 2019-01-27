@@ -80,7 +80,7 @@ class HuabanSpider(CrawlSpider):
         elif 'err' in data:
             logging.info('登录失败：['+data['msg']+']')
             print(data['msg'])
-            os.system('pause') #按任意键继续
+            os.system('pause')
         else:
             logging.info('登录失败：['+response.body+']')
             print(data)
