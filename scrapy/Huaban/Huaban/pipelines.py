@@ -6,7 +6,6 @@
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 import os  #导入os模块
 import requests
-import winreg
 import logging
 
 class HuabanPipeline(object):
@@ -14,11 +13,9 @@ class HuabanPipeline(object):
         self.headers={
             "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36",
         }
-        self.save_path = os.path.join(self.get_desktop(), 'huaban')
-        self.mkdir(self.save_path)
 
     def process_item(self, item, spider):
-        dir_path = os.path.join(self.save_path, item['imgDir'])
+        dir_path = os.path.join(item['savePath'], item['imgDir'])
         self.mkdir(dir_path)
 
         file_path = os.path.join(dir_path, item['imgName']+item['imgType'].replace('image/', '.'))
@@ -62,6 +59,3 @@ class HuabanPipeline(object):
         except Exception as e:
             return False
     
-    def get_desktop(self):
-        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,r'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders')
-        return winreg.QueryValueEx(key, "Desktop")[0]

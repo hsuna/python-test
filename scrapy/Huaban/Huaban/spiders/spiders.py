@@ -2,11 +2,14 @@
 
 import re
 import json
+import os
+import winreg
 
 import scrapy
 from scrapy.spiders import CrawlSpider
 from scrapy.http import Request, FormRequest
 from Huaban.items import HuabanItem
+import logging
 
 class HuabanSpider(CrawlSpider):
     name='huaban'
@@ -66,15 +69,22 @@ class HuabanSpider(CrawlSpider):
 
         if 'user' in data:
             self.urlname = data['user']["urlname"]
+            # 创建保存目录
+            self.save_path = self.create_save_path(self.urlname)
+            os.system('pause') #按任意键继续
             yield Request(
                 url=self.get_url(self.urlname+'/pins/', '?limit='+str(self.limit)),
                 headers={'X-Requested-With':'XMLHttpRequest'}, 
                 callback=self.parse_pin
             )
         elif 'err' in data:
+            logging.info('登录失败：['+data['msg']+']')
             print(data['msg'])
+            os.system('pause') #按任意键继续
         else:
+            logging.info('登录失败：['+response.body+']')
             print(data)
+            os.system('pause')
 
     def parse_pin(self, response):
         data = json.loads(response.body)
@@ -86,6 +96,7 @@ class HuabanSpider(CrawlSpider):
             max = max if int(pin_id) < max else int(pin_id)
             
             item = HuabanItem()
+            item["savePath"] = self.save_path
             item["imgDir"] = pin["board"]["title"]
             item["imgName"] = str(pin["file_id"])
             item["imgType"] = pin["file"]["type"]
@@ -99,5 +110,18 @@ class HuabanSpider(CrawlSpider):
                 callback=self.parse_pin
             )
 
+    def create_save_path(self, dirname):
+        path = os.path.join(self.get_desktop(), self.name, dirname).strip()
+        isExists = os.path.exists(path)
+        if not isExists:
+            os.makedirs(path)
+        logging.info('文件将保存在['+path+']目录下')
+        print('文件将保存在['+path+']目录下, 请保证该目录所在硬盘下有足够的空间！！！')
+        return path
+
     def get_url(self, path, query=''):
         return self.base_url + path + query
+
+    def get_desktop(self):
+        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,r'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders')
+        return winreg.QueryValueEx(key, "Desktop")[0]

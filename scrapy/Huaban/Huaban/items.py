@@ -9,6 +9,8 @@ import scrapy
 
 class HuabanItem(scrapy.Item):
     # define the fields for your item here like:
+    # 保存路径
+    savePath = scrapy.Field()
     # 目录名
     imgDir = scrapy.Field()
     # 类型
