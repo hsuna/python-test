@@ -16,7 +16,6 @@ class HuabanPipeline(object):
         }
         self.save_path = os.path.join(self.get_desktop(), 'huaban')
         self.mkdir(self.save_path)
-        logging.info('保存路径：'+self.save_path)
 
     def process_item(self, item, spider):
         dir_path = os.path.join(self.save_path, item['imgDir'])
@@ -31,7 +30,7 @@ class HuabanPipeline(object):
                 f = open(file_path, 'ab')
                 f.write(img.content)
                 f.close()
-                logging.info('保存图片成功：'+file_path)
+                logging.info('保存图片成功['+file_path+']')
             else:
                 print('下载图片失败', item['imgUrl'])
 
@@ -43,7 +42,7 @@ class HuabanPipeline(object):
         isExists = os.path.exists(path)
         if not isExists:
             os.makedirs(path)
-            print('创建名字叫做', path, '的文件夹')
+            logging.info('创建名字叫做['+path+']的文件夹')
             return True
         else:
             return False

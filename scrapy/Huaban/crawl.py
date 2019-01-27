@@ -51,21 +51,16 @@ import scrapy.pipelines
 import scrapy.core.downloader.handlers.http
 import scrapy.core.downloader.contextfactory
 
+#导入模块
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 
-#导入模块
-import Huaban.middlewares
-import Huaban.pipelines
-import Huaban.settings
-import Huaban.items
-
-from Huaban.spiders.spiders import Huaban2Spider
+from Huaban.spiders.spiders import HuabanSpider
 
 email = input("请输入账号邮箱：")
 password = input("请输入密码：")
 
 process = CrawlerProcess(get_project_settings())
 # 'followall' is the name of one of the spiders of the project.
-process.crawl(Huaban2Spider, email=email, password=password)
+process.crawl(HuabanSpider, email=email, password=password)
 process.start()  # the script will block here until the crawling is finished
