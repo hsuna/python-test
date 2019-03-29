@@ -23,7 +23,7 @@ class retry(object):
 class HuabanPicture():
     def __init__(self):  #类的初始化操作
         self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1'}  #给请求指定一个请求头来模拟chrome浏览器
-        self.web_url = 'http://login.meiwu.co/login'  #要访问的网页地址
+        self.web_url = 'https://passport.alibaba.com/newlogin/icbuLogin.htm'  #要访问的网页地址
         self.folder_path = 'D:\Desktop\Huaban'  #设置图片要存放的文件目录
         self.q = Queue() #线程
         self.THREADS_NUM = 12
@@ -53,20 +53,20 @@ class HuabanPicture():
 
         print('开始网页get请求')
         self.driver.get(self.web_url)
-        self.driver.find_element_by_css_selector('input[name="email"]').send_keys()
+        self.driver.find_element_by_css_selector('input[name="loginId"]').send_keys('sales01@catson.cn')
         time.sleep(1)
-        self.driver.find_element_by_css_selector('input[name="password"]').send_keys()
+        self.driver.find_element_by_css_selector('input[name="password"]').send_keys('Tlf9!!AcjzJp')
         time.sleep(1)
-        self.driver.find_element_by_css_selector('a#submit').click()
+        self.driver.find_element_by_css_selector('#fm-login-submit').click()
 
         time.sleep(3)
-        self.driver.get(self.driver.current_url+'?jra00000&limit=10000&wfl=1')       
+        self.driver.get('https://www.alibaba.com/catalog/engineering-construction-machinery_cid1326?page=1')
 
         selector = BeautifulSoup(self.driver.page_source, 'lxml')
-        links = selector.select('#waterfall div .link')
+        links = selector.select('.stitle a')
 
         for link in links:
-            self.parse_boards({
+            self.parse_company({
                 "url": 'http://login.meiwu.co' + link["href"].strip()
             })
 
