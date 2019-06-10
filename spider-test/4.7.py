@@ -1,6 +1,5 @@
 from selenium import webdriver  #导入Selenium
 import requests
-<<<<<<< HEAD
 from bs4 import BeautifulSoup  #导入BeautifulSoup 模块
 import os  #导入os模块
 import time
@@ -45,7 +44,6 @@ class KXFiction():
 
 comic = KXFiction()  #创建类的实例
 comic.start()  #执行类中的方法
-=======
 import imghdr
 from bs4 import BeautifulSoup  #导入BeautifulSoup 模块
 import os  #导入os模块
@@ -193,4 +191,3 @@ class HuabanPicture():
 
 huaban = HuabanPicture()  #创建类的实例
 huaban.login_user()  #执行类中的方法
->>>>>>> d94a9dc08f5a2cb187dec37a58ce56b8cdd12c2c
