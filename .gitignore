@@ -1,1 +1,16 @@
+*.pyc
+
 .vscode
+
+__pycache__
+
+build
+dist
+
+*.db
+*.log
+
+# egg
+*.egg
+**/egg
+**/project.egg-info
