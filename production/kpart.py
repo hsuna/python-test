@@ -32,11 +32,11 @@ class KPartData():
         self.folder_path = 'D:\Desktop\KPartData\json'  #设置存放的文件目录
         self.img_path = 'D:\Desktop\KPartData\img'  #设置存放的图片目录
         self.logs_path = 'D:\Desktop\KPartData\logs'  #设置存放的历史记录目录
-        self.q = Queue() #线程
-        self.THREADS_NUM = 24
+        self.q = Queue() #队列
+        self.THREADS_NUM = 32
     
     def working(self):
-        while True:
+        while not self.q.empty():
             arguments = self.q.get()
             self.request_task(*arguments)
             self.q.task_done()
@@ -57,10 +57,6 @@ class KPartData():
             t = Thread(target=self.working)#线程的执行函数为working
             threads.append(t)
 
-        for item in threads:
-            item.setDaemon(True)
-            item.start()
-
         print('开始获取数据')
         self.q.put((self.tree_url, {
             'depth': 0,
@@ -70,13 +66,19 @@ class KPartData():
             'node': 'root'
         }))
 
-        #等待进程结束
-        self.q.join()
+        print('开始处理数据')
+        for item in threads:
+            item.setDaemon(True)
+            item.start()
+            
+        # 等待所有线程完成
+        for t in threads:
+            t.join()
         self.log('数据获取执行完成！！！')
 
     def processing_data(self, data, depth):
         book = data["book"] if "book" in data else ''
-        if "leaf" in data and data["leaf"] == "1": #叶子，转去查询page
+        if "leaf" in data: #叶子，转去查询page
             url = self.page_url
             data = {
                 'book': book,
@@ -100,25 +102,31 @@ class KPartData():
         content = False
         if isExists:
             content = self.get_file(filepath)
-        else:
+            # self.log('文件已存在：', filepath)
+            try: 
+                json.loads(content)
+            except Exception:
+                content = False
+
+        if not content:
             r = self.request(url, data)
             if r:
                 content = r.text
                 self.mkdir(path)#创建文件夹
                 self.save_file(filepath, content)
             else:
-                self.error('请求文件失败：', json.dumps(data))
+                self.error('请求文件失败：', url, json.dumps(data))
                 return
-
-
+        
         if content:
-            if 'tree' in url:
-                items = json.loads(content)
-                for item in items:
-                    self.processing_data(item, data["depth"]+1)
-            elif 'page' in url: #page
-                try:
-                    rdata = json.loads(content)
+            try:
+                if 'tree' in url:
+                    items = json.loads(content)
+                    for item in items:
+                        self.processing_data(item, data["depth"]+1)
+                elif 'page' in url: #page
+                    pass
+                    """rdata = json.loads(content)
                     for img in rdata["image"]:
                         if "PicName" in img:
                             url = self.img_url+'/'+img["BookDir"]+'/'+img["PicName"]
@@ -126,11 +134,11 @@ class KPartData():
                             filepath = os.path.join(path, img["PicName"])
                             self.mkdir(path)#创建文件夹
                             self.save_img(filepath, url)
-                except Exception as e:
-                    self.error('json解析失败：', url)
-
+                    """
+            except Exception:
+                self.error('json解析失败：', json.dumps(data))
         else:
-            self.error('请求文件失败：', json.dumps(data))
+           self.error('请求文件失败：', url, json.dumps(data))
 
     def get_file(self, filepath):
         try:
@@ -146,10 +154,10 @@ class KPartData():
 
     def save_file(self, filepath, content):
         print('开始保存文件数据')
-        f = open(filepath, 'a+')
-        f.write(content)
-        self.log('文件保存成功：', filepath)
+        f = open(filepath, 'w')
+        f.write(content) 
         f.close()
+        self.log('文件保存成功：', filepath)
         return True
 
     def save_img(self, filepath, url):
@@ -175,13 +183,13 @@ class KPartData():
 
     def log(self, *content):
         print(*content)
-        f = open(self.access_path, 'a+')
+        f = open(self.access_path, 'a')
         f.write("  ".join(content)+'\n')
         f.close()
 
     def error(self, *content):
         print(*content)
-        f = open(self.error_path, 'a+')
+        f = open(self.error_path, 'a')
         f.write("  ".join(content)+'\n')
         f.close()
 
