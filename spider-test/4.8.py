@@ -17,22 +17,28 @@ class OPComic():
 
         req = self.request(self.web_url)
         all_a = BeautifulSoup(req.text, 'lxml').select('.pure-u-1-2 a')
-        a = all_a[0]
+        start = 500
 
-        for a in all_a:
+        for a in all_a[start:]:
             sava_path = os.path.join(self.folder_path, a['title'])
             self.mkdir(sava_path)
-            print('切换子文件夹', sava_path)
+            print('切换子文件夹', sava_path, start)
             os.chdir(sava_path)   #切换路径至上面创建的文件夹
 
             page = 1
             start_url = next_url = self.web_url+a['href']
             while next_url:
                 req = self.request(next_url)
-                result = re.search(r'var ?mhurl="([^"]*)"', req.text)
-                if result:
-                    url = 'http://p0.xiaoshidi.net/' + result.group(1)
-                    self.save_img(url, str(page)+'.jpg')  # 调用save_img方法来保存图片
+
+                file_path = str(page)+'.jpg'
+                if not os.path.exists(file_path):
+                    result = re.search(r'var ?mhurl="([^"]*)"', req.text)
+                    if result:
+                        url = 'http://p0.xiaoshidi.net/' + result.group(1)
+                        self.save_img(url, file_path)  # 调用save_img方法来保存图片
+                else:
+                    #print(os.path.join(sava_path, file_path), '已经存在了，不用下载')
+                    pass
 
                 result = re.search(r'"#mhimg0"\)\.html\(\'<a href="([^"]*)">', req.text)
                 if result:
@@ -40,11 +46,13 @@ class OPComic():
                 else:
                     next_url = False
                 page += 1
+        
+            start += 1
 
     def save_img(self, url, file_name): ##保存图片
-        print('开始请求图片地址，过程会有点长...')
+        #print('开始请求图片地址，过程会有点长...')
         img = self.request(url)
-        print('开始保存图片')
+        #print('开始保存图片')
         f = open(file_name, 'ab')
         f.write(img.content)
         print(file_name,'图片保存成功！')
@@ -58,13 +66,13 @@ class OPComic():
         path = path.strip()
         isExists = os.path.exists(path)
         if not isExists:
-            print('创建名字叫做', path, '的文件夹')
             os.makedirs(path)
-            print('创建成功！')
+            print('创建名字叫做', path, '的文件夹')
             return True
         else:
-            print(path, '文件夹已经存在了，不再创建')
+            #print(path, '文件夹已经存在了，不再创建')
             return False
+            
 
 comic = OPComic()  #创建类的实例
 comic.get_pic()  #执行类中的方法
