@@ -7,7 +7,7 @@ import time
 class KXFiction():
     def __init__(self):  #类的初始化操作
         self.headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1'}  #给请求指定一个请求头来模拟chrome浏览器
-        self.web_url = 'https://m.boluoxs.com/'  #要访问的网页地址
+        self.web_url = 'https://www.bxwx666.org/'  #要访问的网页地址
         self.folder_path = 'D:\Desktop\quanzhigaoshou.txt'  #设置图片要存放的文件目录
 
     def start(self):
@@ -35,6 +35,8 @@ class KXFiction():
             txt = '\t' + tm + '\r\n\r\n' + nr + '\r\n\r\n'
             f.write(txt.encode('utf-8'))
             print(tm)
+            
+            time.sleep(3) #休眠500毫秒，反反爬虫
             
         f.close()
     
